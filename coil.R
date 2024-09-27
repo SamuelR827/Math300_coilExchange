@@ -10,22 +10,46 @@ global_trend <- ANXIETY %>%
   group_by(Year) %>%
   summarise(global_anxiety = mean(Anxiety, na.rm = TRUE))
 
-# 2. Plot the global anxiety trend over time
+# 2. Calculate global statistics (mean, median, std dev) for the entire dataset
+global_stats <- ANXIETY %>%
+  summarise(
+    global_mean = mean(Anxiety, na.rm = TRUE),
+    global_median = median(Anxiety, na.rm = TRUE),
+    global_sd = sd(Anxiety, na.rm = TRUE)
+  )
+
+# Display global statistics
+print("Global Anxiety Statistics (1990-2019):")
+print(global_stats)
+
+# 3. Plot the global anxiety trend over time
 ggplot(global_trend, aes(x = Year, y = global_anxiety)) +
   geom_line(color = "blue", size = 1) +
   labs(title = "Global Anxiety Prevalence Trend (1990-2019)",
        x = "Year", y = "Average Anxiety Prevalence (%)") +
   theme_minimal()
 
-# 3. Plot trends for individual countries
-# Select some specific countries (e.g., 'United States', 'India', 'China')
+# 4. Calculate statistics for individual countries
 countries <- c('United States', 'India', 'China')
 
 for (country in countries) {
+  # Filter data for the selected country
   country_data <- ANXIETY %>%
     filter(Entity == country)
   
-  # Create the plot for the selected country
+  # Calculate the mean, median, and standard deviation for each country
+  country_stats <- country_data %>%
+    summarise(
+      country_mean = mean(Anxiety, na.rm = TRUE),
+      country_median = median(Anxiety, na.rm = TRUE),
+      country_sd = sd(Anxiety, na.rm = TRUE)
+    )
+  
+  # Print the statistics for each country
+  print(paste("Anxiety Statistics for", country, "(1990-2019):"))
+  print(country_stats)
+  
+  # 5. Plot the trend for the selected country
   p <- ggplot(country_data, aes(x = Year, y = Anxiety)) +
     geom_line(color = "green", size = 1) +
     labs(title = paste("Anxiety Trend in", country, "(1990-2019)"),
@@ -36,14 +60,14 @@ for (country in countries) {
   print(p)
 }
 
-# 4. Box-Whisker plot for global anxiety trends
+# 6. Box-Whisker plot for global anxiety trends
 ggplot(ANXIETY, aes(x = as.factor(Year), y = Anxiety)) +
   geom_boxplot(fill = "lightblue") +
   labs(title = "Global Anxiety Distribution (1990-2019)",
        x = "Year", y = "Anxiety Prevalence (%)") +
   theme_minimal()
 
-# 5. Box-Whisker plot for individual countries
+# 7. Box-Whisker plot for individual countries
 for (country in countries) {
   country_data <- ANXIETY %>%
     filter(Entity == country)
